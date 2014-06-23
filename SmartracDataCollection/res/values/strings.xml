@@ -1,0 +1,5 @@
+<resources>
+
+    <string name="app_name">Smartrac Data Collection</string>
+	<string name="gps_service_name">GPS Service</string>
+</resources>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mode_tracking_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp" >
+
+    <TextView
+        android:id="@+id/mode_tracking_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Tracking Note"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <RadioGroup
+        android:id="@+id/mode_tracking_modes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/mode_tracking_title"
+        android:layout_marginTop="16dp" >
+
+        <RadioButton
+            android:id="@+id/unknown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Unknown" />
+
+        <RadioButton
+            android:id="@+id/walk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Walking" />
+
+        <RadioButton
+            android:id="@+id/bike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bicycle" />
+
+        <RadioButton
+            android:id="@+id/bus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bus" />
+
+        <RadioButton
+            android:id="@+id/rail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rail" />
+
+        <RadioButton
+            android:id="@+id/car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Car" />
+
+        <RadioButton
+            android:id="@+id/wait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wait" />
+
+        <RadioButton
+            android:id="@+id/dwelling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dwelling" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/update_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Confirm" />
+
+    <Button
+        android:id="@+id/stop_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Stop" />
+
+    <ScrollView
+        android:id="@+id/mode_tracking_note_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/update_service"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/mode_tracking_modes"
+        android:background="@drawable/black_boarder"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp" 
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" 
+    		android:focusable="true"
+    		android:focusableInTouchMode="true">
+            <EditText
+            android:id="@+id/mode_tracking_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Note">
+
+        	</EditText>
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>
