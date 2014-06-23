@@ -53,19 +53,20 @@
             android:id="@+id/gps_file_1s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1s" />
+            android:checked="true"
+            android:text="1" />
 
         <RadioButton
             android:id="@+id/gps_file_5s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5s" />
+            android:text="5" />
 
         <RadioButton
             android:id="@+id/gps_file_30s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30s" />
+            android:text="30" />
     </RadioGroup>
 
     <TextView
@@ -75,26 +76,26 @@
         android:text="ACC Sampling Rate" />
 
     <RadioGroup
-        android:id="@+id/RadioGroup02"
+        android:id="@+id/acc_sampling_rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
         <RadioButton
-            android:id="@+id/dwelling"
+            android:id="@+id/acc_sampling_rate_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="No" />
 
         <RadioButton
-            android:id="@+id/rail"
+            android:id="@+id/acc_sampling_rate_1s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1s" />
 
         <RadioButton
-            android:id="@+id/car"
+            android:id="@+id/acc_sampling_rate_5s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5s" />
@@ -107,28 +108,29 @@
         android:text="ACC write file rate" />
 
     <RadioGroup
-        android:id="@+id/RadioGroup01"
+        android:id="@+id/acc_filing_rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
         <RadioButton
-            android:id="@+id/unknown"
+            android:id="@+id/acc_filing_rate_1s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1s" />
+            android:checked="true"
+            android:text="1" />
 
         <RadioButton
-            android:id="@+id/wait"
+            android:id="@+id/acc_filing_rate_5s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5s" />
+            android:text="5" />
 
         <RadioButton
-            android:id="@+id/RadioButton06"
+            android:id="@+id/acc_filing_rate_30s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30s" />
+            android:text="30" />
     </RadioGroup>
 
     <Button

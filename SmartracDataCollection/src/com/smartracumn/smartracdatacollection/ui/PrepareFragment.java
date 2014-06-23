@@ -121,6 +121,7 @@ public class PrepareFragment extends Fragment {
 		protected void onPostExecute(Boolean isRunning) {
 			publishProgress(100);
 			if (getActivity() != null) {
+				((MainActivity) getActivity()).setIsRecording(isRunning);
 				if (isRunning) {
 					((MainActivity) getActivity()).gotoModeTracking();
 				} else {

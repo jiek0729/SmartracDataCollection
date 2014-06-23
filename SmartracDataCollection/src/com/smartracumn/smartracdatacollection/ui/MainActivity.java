@@ -1,5 +1,8 @@
 package com.smartracumn.smartracdatacollection.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -14,10 +17,60 @@ public class MainActivity extends FragmentActivity {
 
 	private ProgressBar progressBar;
 
+	private int gpsSamplingRate = 0;
+
+	private int gpsWriteFileRate = 0;
+
+	private int accSamplingRate = 0;
+
+	private int accWriteFileRate = 0;
+
+	private Map<Integer, Integer> buttonValueMapping;
+
+	private void initializeButtonValueMapping() {
+		buttonValueMapping = new HashMap<Integer, Integer>();
+		buttonValueMapping.put(R.id.gps_no, 0);
+		buttonValueMapping.put(R.id.gps_1s, 1);
+		buttonValueMapping.put(R.id.gps_5s, 5);
+		buttonValueMapping.put(R.id.gps_file_1s, 1);
+		buttonValueMapping.put(R.id.gps_file_5s, 5);
+		buttonValueMapping.put(R.id.gps_file_30s, 30);
+		buttonValueMapping.put(R.id.acc_sampling_rate_no, 0);
+		buttonValueMapping.put(R.id.acc_sampling_rate_1s, 1);
+		buttonValueMapping.put(R.id.acc_sampling_rate_5s, 5);
+		buttonValueMapping.put(R.id.acc_filing_rate_1s, 1);
+		buttonValueMapping.put(R.id.acc_filing_rate_5s, 5);
+		buttonValueMapping.put(R.id.acc_filing_rate_30s, 30);
+	}
+
+	private boolean isRecording;
+
+	public void setIsRecording(boolean isRecording) {
+		this.isRecording = isRecording;
+	}
+
+	public boolean getIsRecording() {
+		return isRecording;
+	}
+
+	public void setRates(int gpsRateId, int gpsFileId, int accRateId,
+			int accFileId) {
+		gpsSamplingRate = buttonValueMapping.get(gpsRateId) * 1000;
+
+		gpsWriteFileRate = buttonValueMapping.get(gpsFileId);
+
+		accSamplingRate = buttonValueMapping.get(accRateId);
+
+		accWriteFileRate = buttonValueMapping.get(accFileId);
+	}
+
 	public void startGpsService() {
-		Intent service = new Intent(this, GpsService.class);
-		service.putExtra(GpsService.GPS_SAMPLING_RATE, 1000);
-		this.startService(service);
+		if (gpsSamplingRate > 0 && gpsWriteFileRate > 0) {
+			Intent service = new Intent(this, GpsService.class);
+			service.putExtra(GpsService.GPS_SAMPLING_RATE, gpsSamplingRate);
+			service.putExtra(GpsService.GPS_WRITE_FILE_RATE, gpsWriteFileRate);
+			this.startService(service);
+		}
 	}
 
 	public void stopGpsService() {
@@ -28,7 +81,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, getClass().getSimpleName() + " onCreate()");
-
+		initializeButtonValueMapping();
 		setContentView(R.layout.main_activity);
 	}
 

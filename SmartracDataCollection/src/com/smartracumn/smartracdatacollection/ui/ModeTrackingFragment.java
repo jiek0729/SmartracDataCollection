@@ -1,9 +1,6 @@
 package com.smartracumn.smartracdatacollection.ui;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.smartracumn.smartracdatacollection.R;
-import com.smartracumn.smartracdatacollection.service.GpsService;
 
 public class ModeTrackingFragment extends Fragment {
 	private final String TAG = getClass().getName();
@@ -57,6 +53,14 @@ public class ModeTrackingFragment extends Fragment {
 		update = (Button) getView().findViewById(R.id.update_service);
 		stop = (Button) getView().findViewById(R.id.stop_service);
 
+		if (getActivity() != null) {
+			if (((MainActivity) getActivity()).getIsRecording()) {
+				getView().findViewById(R.id.mode_tracking_container)
+						.setBackgroundColor(
+								getResources().getColor(R.color.green));
+			}
+		}
+
 		update.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -74,24 +78,10 @@ public class ModeTrackingFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (getActivity() != null) {
-					if (isMyServiceRunning(GpsService.class)) {
-						((MainActivity) getActivity()).stopGpsService();
-					}
+					((MainActivity) getActivity()).stopGpsService();
 				}
 			}
 		});
-	}
-
-	private boolean isMyServiceRunning(Class<?> serviceClass) {
-		ActivityManager manager = (ActivityManager) getActivity()
-				.getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if (serviceClass.getName().equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
