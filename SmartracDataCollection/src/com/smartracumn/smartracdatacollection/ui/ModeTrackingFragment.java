@@ -68,6 +68,7 @@ public class ModeTrackingFragment extends Fragment {
 				// TODO Auto-generated method stub
 				if (getActivity() != null) {
 					((MainActivity) getActivity()).startGpsService();
+					((MainActivity) getActivity()).startAccService();
 				}
 			}
 		});
@@ -79,6 +80,7 @@ public class ModeTrackingFragment extends Fragment {
 				// TODO Auto-generated method stub
 				if (getActivity() != null) {
 					((MainActivity) getActivity()).stopGpsService();
+					((MainActivity) getActivity()).stopAccService();
 				}
 			}
 		});

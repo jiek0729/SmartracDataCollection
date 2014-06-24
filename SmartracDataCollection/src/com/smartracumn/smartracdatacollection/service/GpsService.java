@@ -78,7 +78,8 @@ public class GpsService extends Service implements LocationListener {
 
 	public void registerLocationListener() {
 		LocationManager mngr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mngr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.01f,
+		mngr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		mngr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
 				this);
 	}
 
@@ -111,7 +112,6 @@ public class GpsService extends Service implements LocationListener {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO do something useful
-		Log.i(TAG, getClass().getSimpleName() + "service on start command.");
 
 		if (intent != null) {
 			gpsSamplingRate = intent.getIntExtra(GPS_SAMPLING_RATE,
@@ -120,6 +120,10 @@ public class GpsService extends Service implements LocationListener {
 			gpsWriteFileRate = intent.getIntExtra(GPS_WRITE_FILE_RATE,
 					gpsWriteFileRate);
 		}
+
+		Log.i(TAG, getClass().getSimpleName()
+				+ "service on start command with Rate: " + gpsSamplingRate
+				+ " File rate: " + gpsWriteFileRate);
 
 		if (gpsSamplingRate > 0) {
 			gpsUpdateHandler.removeCallbacks(gpsRecorderRunnable);

@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Service;
@@ -15,12 +16,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
 import android.opengl.Matrix;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import com.smartracumn.smartracdatacollection.model.SmartracSensorData;
@@ -29,15 +31,93 @@ import com.smartracumn.smartracdatacollection.util.SmartracDataFormat;
 public class AccService extends Service implements SensorEventListener {
 	private final String TAG = getClass().getName();
 
+	public static final String ACC_SAMPLING_RATE = "ACC sampling rate";
+
+	public static final String ACC_WRITE_FILE_RATE = "ACC write file rate";
+
 	private MyBinder myBinder = new MyBinder();
 
 	private int accSamplingRate = 0;
 
 	private int accWriteFileRate = 0;
 
-	private List<Location> cachedLocations = new ArrayList<Location>();
+	private List<SmartracSensorData> cachedSensorData = new ArrayList<SmartracSensorData>();
 
-	private Location currentLocation;
+	private SmartracSensorData currentSensorData;
+
+	Handler accUpdateHandler = new Handler();
+
+	Runnable accRecorderRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			if (accSamplingRate > 0) {
+				if (currentSensorData != null) {
+					cachedSensorData.add(currentSensorData);
+					if (cachedSensorData.size() == accWriteFileRate) {
+						List<SmartracSensorData> temp = new ArrayList<SmartracSensorData>(
+								cachedSensorData);
+						cachedSensorData.clear();
+						writeToFile(temp);
+					}
+				}
+
+				accUpdateHandler.postDelayed(this, accSamplingRate);
+			}
+		}
+
+		private void writeToFile(final List<SmartracSensorData> sensorData) {
+			// TODO Auto-generated method stub
+			Handler handler = new Handler(Looper.getMainLooper());
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					new WriteFileTask().execute(sensorData);
+				}
+			});
+		}
+	};
+
+	@Override
+	public void onCreate() {
+		Log.i(TAG, getClass().getSimpleName() + ":entered onCreate()");
+		super.onCreate();
+		registerSensorListener();
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroy()");
+		accUpdateHandler.removeCallbacks(accRecorderRunnable);
+		unregisterSensorListener();
+		super.onDestroy();
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		// TODO do something useful
+
+		if (intent != null) {
+			accSamplingRate = intent.getIntExtra(ACC_SAMPLING_RATE,
+					accSamplingRate);
+
+			accWriteFileRate = intent.getIntExtra(ACC_WRITE_FILE_RATE,
+					accWriteFileRate);
+		}
+
+		Log.i(TAG, getClass().getSimpleName()
+				+ "service on start command with Rate: " + accSamplingRate
+				+ " File rate: " + accWriteFileRate);
+
+		if (accSamplingRate > 0) {
+			accUpdateHandler.removeCallbacks(accRecorderRunnable);
+
+			accUpdateHandler.postDelayed(accRecorderRunnable, accSamplingRate);
+		}
+
+		return Service.START_STICKY;
+	}
 
 	public boolean hasSensor() {
 		return getAccelorometer() != null;
@@ -46,13 +126,14 @@ public class AccService extends Service implements SensorEventListener {
 	private List<Sensor> getAccelorometer() {
 		SensorManager mngr = (SensorManager) this
 				.getSystemService(Context.SENSOR_SERVICE);
-		List<Sensor> list = mngr.getSensorList(Sensor.TYPE_GRAVITY);
-		list.addAll(mngr.getSensorList(Sensor.TYPE_MAGNETIC_FIELD));
-		list.addAll(mngr.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION));
+		// List<Sensor> list = mngr.getSensorList(Sensor.TYPE_GRAVITY);
+		// list.addAll(mngr.getSensorList(Sensor.TYPE_MAGNETIC_FIELD));
+		// list.addAll(mngr.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION));
+		List<Sensor> list = mngr.getSensorList(Sensor.TYPE_ACCELEROMETER);
 		return list != null && !list.isEmpty() ? list : null;
 	}
 
-	public void registerListener() {
+	public void registerSensorListener() {
 		SensorManager mngr = (SensorManager) this
 				.getSystemService(Context.SENSOR_SERVICE);
 		List<Sensor> list = getAccelorometer();
@@ -64,7 +145,7 @@ public class AccService extends Service implements SensorEventListener {
 		}
 	}
 
-	public void unregisterListener() {
+	public void unregisterSensorListener() {
 		if (hasSensor()) {
 			SensorManager mngr = (SensorManager) this
 					.getSystemService(Context.SENSOR_SERVICE);
@@ -127,6 +208,9 @@ public class AccService extends Service implements SensorEventListener {
 						+ Math.pow(trueAcceleration[1], 2));
 			}
 		}
+
+		currentSensorData = new SmartracSensorData(new Date(),
+				linearAcceleration, trueAcceleration);
 	}
 
 	@Override

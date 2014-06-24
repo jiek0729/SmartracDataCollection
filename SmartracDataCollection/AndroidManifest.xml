@@ -28,6 +28,8 @@
         </activity>
         
         <service android:icon="@drawable/smartrac_data_collection_icon" android:name="com.smartracumn.smartracdatacollection.service.GpsService" android:label="@string/gps_service_name"/>
+        
+        <service android:icon="@drawable/smartrac_data_collection_icon" android:name="com.smartracumn.smartracdatacollection.service.AccService" android:label="@string/acc_service_name"/>
     </application>
 
 </manifest>

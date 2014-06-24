@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.smartracumn.smartracdatacollection.R;
+import com.smartracumn.smartracdatacollection.service.AccService;
 import com.smartracumn.smartracdatacollection.service.GpsService;
 
 public class MainActivity extends FragmentActivity {
@@ -59,7 +60,7 @@ public class MainActivity extends FragmentActivity {
 
 		gpsWriteFileRate = buttonValueMapping.get(gpsFileId);
 
-		accSamplingRate = buttonValueMapping.get(accRateId);
+		accSamplingRate = buttonValueMapping.get(accRateId) * 1000;
 
 		accWriteFileRate = buttonValueMapping.get(accFileId);
 	}
@@ -75,6 +76,19 @@ public class MainActivity extends FragmentActivity {
 
 	public void stopGpsService() {
 		this.stopService(new Intent(this, GpsService.class));
+	}
+
+	public void startAccService() {
+		if (accSamplingRate > 0 && accWriteFileRate > 0) {
+			Intent service = new Intent(this, AccService.class);
+			service.putExtra(AccService.ACC_SAMPLING_RATE, accSamplingRate);
+			service.putExtra(AccService.ACC_WRITE_FILE_RATE, accWriteFileRate);
+			this.startService(service);
+		}
+	}
+
+	public void stopAccService() {
+		this.stopService(new Intent(this, AccService.class));
 	}
 
 	@Override
