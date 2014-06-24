@@ -42,18 +42,6 @@ public class GpsService extends Service implements LocationListener {
 
 	private Location currentLocation;
 
-	private void clearCachedLocation() {
-		synchronized (cachedLocations) {
-			cachedLocations.clear();
-		}
-	}
-
-	private void addToCachedLocation(Location location) {
-		synchronized (cachedLocations) {
-			cachedLocations.add(location);
-		}
-	}
-
 	Handler gpsUpdateHandler = new Handler();
 
 	Runnable gpsRecorderRunnable = new Runnable() {
@@ -158,7 +146,7 @@ public class GpsService extends Service implements LocationListener {
 			}
 
 			if (myDir.exists()) {
-				return new File(myDir.getPath() + "/Test.txt");
+				return new File(myDir.getPath() + "/Gps.txt");
 			}
 
 			return null;
