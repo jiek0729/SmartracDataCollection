@@ -174,7 +174,7 @@ public class GpsService extends Service implements LocationListener {
 
 		if (intent != null) {
 			gpsSamplingRate = intent.getIntExtra(GPS_SAMPLING_RATE,
-					gpsSamplingRate) * 1000;
+					gpsSamplingRate);
 
 			gpsWriteFileRate = intent.getIntExtra(GPS_WRITE_FILE_RATE,
 					gpsWriteFileRate);

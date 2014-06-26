@@ -56,12 +56,12 @@ public class SmartracServiceState {
 	public String toString() {
 		String msg = "Running Service: ";
 		if (gpsRunning && accRunning) {
-			msg += String.format("GPS(%ds, %d), ACC(%ds, %d)", gpsRate,
+			msg += String.format("GPS(%dms, %d), ACC(%dms, %d)", gpsRate,
 					gpsFileRate, accRate, accFileRate);
 		} else if (gpsRunning) {
-			msg += String.format("GPS(%ds, %d)", gpsRate, gpsFileRate);
+			msg += String.format("GPS(%dms, %d)", gpsRate, gpsFileRate);
 		} else if (accRunning) {
-			msg += String.format("ACC(%ds, %d)", accRate, accFileRate);
+			msg += String.format("ACC(%dms, %d)", accRate, accFileRate);
 		} else {
 			msg += "None";
 		}

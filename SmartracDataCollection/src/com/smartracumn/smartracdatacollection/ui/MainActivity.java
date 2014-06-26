@@ -100,8 +100,7 @@ public class MainActivity extends FragmentActivity {
 					currentState.getAccFileRate());
 			state.setMode(currentState.getMode());
 			setCurrentState(state);
-			Toast.makeText(getApplicationContext(), "Service Started",
-					Toast.LENGTH_LONG);
+			Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -114,8 +113,7 @@ public class MainActivity extends FragmentActivity {
 
 			setCurrentState(state);
 			gotoSamplingSetting();
-			Toast.makeText(getApplicationContext(), "Service Stopped",
-					Toast.LENGTH_LONG);
+			Toast.makeText(this, "Service Stopped", Toast.LENGTH_LONG).show();
 		}
 	}
 

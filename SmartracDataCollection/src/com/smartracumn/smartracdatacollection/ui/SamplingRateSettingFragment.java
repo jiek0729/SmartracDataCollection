@@ -33,15 +33,16 @@ public class SamplingRateSettingFragment extends Fragment {
 	private void initializeButtonValueMapping() {
 		ratesMapping = new HashMap<Integer, Integer>();
 		ratesMapping.put(R.id.gps_no, 0);
-		ratesMapping.put(R.id.gps_1s, 1);
-		ratesMapping.put(R.id.gps_5s, 5);
+		ratesMapping.put(R.id.gps_1s, 1000);
+		ratesMapping.put(R.id.gps_5s, 5000);
 		ratesMapping.put(R.id.gps_file_1s, 1);
 		ratesMapping.put(R.id.gps_file_5s, 5);
 		ratesMapping.put(R.id.gps_file_30s, 30);
 		ratesMapping.put(R.id.gps_file_no, 0);
 		ratesMapping.put(R.id.acc_sampling_rate_no, 0);
-		ratesMapping.put(R.id.acc_sampling_rate_1s, 1);
-		ratesMapping.put(R.id.acc_sampling_rate_5s, 5);
+		ratesMapping.put(R.id.acc_sampling_rate_5hz, 500);
+		ratesMapping.put(R.id.acc_sampling_rate_1s, 1000);
+		ratesMapping.put(R.id.acc_sampling_rate_5s, 5000);
 		ratesMapping.put(R.id.acc_filing_rate_no, 0);
 		ratesMapping.put(R.id.acc_filing_rate_1s, 1);
 		ratesMapping.put(R.id.acc_filing_rate_5s, 5);
