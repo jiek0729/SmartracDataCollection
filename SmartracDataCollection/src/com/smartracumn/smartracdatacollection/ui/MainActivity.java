@@ -88,7 +88,8 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void startServices() {
-		if (!currentState.hasServiceRunning()) {
+		if (!currentState.hasServiceRunning()
+				&& (currentState.getGpsRate() > 0 || currentState.getAccRate() > 0)) {
 			startGpsService();
 			startAccService();
 			SmartracServiceState state = new SmartracServiceState(

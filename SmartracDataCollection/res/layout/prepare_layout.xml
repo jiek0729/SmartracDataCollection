@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/smartrac_data_collection_icon" />
+        android:src="@drawable/smartrac_data_collection_icon"
+        android:contentDescription="@string/app_name" />
 
     <ProgressBar
         android:id="@+id/prepare_progress_bar"

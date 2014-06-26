@@ -1,161 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/samping_rate_setting_container"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/mode_tracking_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/gps_rates_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GPS Sampling Rate" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
 
-    <RadioGroup
-        android:id="@+id/gps_sampling_rate"
-        android:layout_width="wrap_content"
+	    <TextView
+	        android:id="@+id/gps_sampling_rate_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/gps_sampling_rate"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+	        android:id="@+id/gps_sampling_rate"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	
+	        <RadioButton
+	            android:id="@+id/gps_no"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true"
+	            android:text="@string/no_rate" />
+	
+	        <RadioButton
+	            android:id="@+id/gps_1s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/one_sec" />
+	
+	        <RadioButton
+	            android:id="@+id/gps_5s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/five_sec" />
+	    </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/gps_filerates_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical" 
+        android:layout_below="@+id/gps_rates_container"
+        android:background="@color/text_background">
 
-        <RadioButton
-            android:id="@+id/gps_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="No" />
-
-        <RadioButton
-            android:id="@+id/gps_1s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1s" />
-
-        <RadioButton
-            android:id="@+id/gps_5s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5s" />
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
+	    <TextView
+	        android:id="@+id/gps_filing_rate_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/gps_file_writing_rate"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+	        android:id="@+id/gps_filing_rate"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	        
+	        <RadioButton
+	            android:id="@+id/gps_file_no"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true"
+	            android:text="@string/no_rate" />
+	
+	        <RadioButton
+	            android:id="@+id/gps_file_1s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/one_record_per_write" />
+	
+	        <RadioButton
+	            android:id="@+id/gps_file_5s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/five_record_per_write" />
+	
+	        <RadioButton
+	            android:id="@+id/gps_file_30s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/thirty_record_per_write" />
+	    </RadioGroup>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/acc_rates_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GPS write file rate" />
+        android:orientation="vertical" 
+        android:layout_below="@+id/gps_filerates_container">
 
-    <RadioGroup
-        android:id="@+id/gps_filing_rate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-        
-        <RadioButton
-            android:id="@+id/gps_file_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="No" />
+	    <TextView
+	        android:id="@+id/acc_sampling_rate_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/acc_sampling_rate"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+	        android:id="@+id/acc_sampling_rate"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	
+	        <RadioButton
+	            android:id="@+id/acc_sampling_rate_no"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true"
+	            android:text="@string/no_rate" />
+	        
+	        <RadioButton
+	            android:id="@+id/acc_sampling_rate_5hz"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/five_hz" />
+	
+	        <RadioButton
+	            android:id="@+id/acc_sampling_rate_1s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/one_sec" />
+	
+	        <RadioButton
+	            android:id="@+id/acc_sampling_rate_5s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/five_sec" />
+	    </RadioGroup>
+    </LinearLayout>
+    
+     <LinearLayout
+     android:id="@+id/acc_filerates_container"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical" 
+     android:layout_below="@+id/acc_rates_container"
+     android:background="@color/text_background">
+	    <TextView
+	        android:id="@+id/acc_filing_rate_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/acc_file_writing_rate"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+	        android:id="@+id/acc_filing_rate"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	        
+	        <RadioButton
+	            android:id="@+id/acc_filing_rate_no"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true"
+	            android:text="@string/no_rate" />
+	
+	        <RadioButton
+	            android:id="@+id/acc_filing_rate_1s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/one_record_per_write" />
+	
+	        <RadioButton
+	            android:id="@+id/acc_filing_rate_5s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/five_record_per_write" />
+	
+	        <RadioButton
+	            android:id="@+id/acc_filing_rate_30s"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/thirty_record_per_write" />
+	    </RadioGroup>
+    </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/gps_file_1s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1" />
+     <Button
+         android:id="@+id/sampling_setting_next"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="37dp"
+         android:text="@string/go_to_mode" />
 
-        <RadioButton
-            android:id="@+id/gps_file_5s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5" />
-
-        <RadioButton
-            android:id="@+id/gps_file_30s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="30" />
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/TextView02"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ACC Sampling Rate" />
-
-    <RadioGroup
-        android:id="@+id/acc_sampling_rate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/acc_sampling_rate_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="No" />
-        
-        <RadioButton
-            android:id="@+id/acc_sampling_rate_5hz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5Hz" />
-
-        <RadioButton
-            android:id="@+id/acc_sampling_rate_1s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1s" />
-
-        <RadioButton
-            android:id="@+id/acc_sampling_rate_5s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5s" />
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ACC write file rate" />
-
-    <RadioGroup
-        android:id="@+id/acc_filing_rate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-        
-        
-        <RadioButton
-            android:id="@+id/acc_filing_rate_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="No" />
-
-        <RadioButton
-            android:id="@+id/acc_filing_rate_1s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1" />
-
-        <RadioButton
-            android:id="@+id/acc_filing_rate_5s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5" />
-
-        <RadioButton
-            android:id="@+id/acc_filing_rate_30s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="30" />
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/sampling_setting_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="continue" />
-
-</LinearLayout>
+</RelativeLayout>

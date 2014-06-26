@@ -10,13 +10,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-	    <TextView
+	    <TextView
 	        android:id="@+id/mode_tracking_title"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentTop="true"
 	        android:layout_centerHorizontal="true"
-	        android:text="Tracking Note"
+	        android:text="@string/mode_tracking_header"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	    <TextView
@@ -41,49 +41,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Unknown" />
+            android:text="@string/unknown_mode" />
 
         <RadioButton
             android:id="@+id/walk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Walking" />
+            android:text="@string/walking_mode" />
 
         <RadioButton
             android:id="@+id/bike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bicycle" />
+            android:text="@string/bike_mode" />
 
         <RadioButton
             android:id="@+id/bus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bus" />
+            android:text="@string/bus_mode" />
 
         <RadioButton
             android:id="@+id/rail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Rail" />
+            android:text="@string/rail_mode" />
 
         <RadioButton
             android:id="@+id/car"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Car" />
+            android:text="@string/car_mode" />
 
         <RadioButton
             android:id="@+id/wait"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Wait" />
+            android:text="@string/wait_mode" />
 
         <RadioButton
             android:id="@+id/dwelling"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dwelling" />
+            android:text="@string/dwelling_mode" />
     </RadioGroup>
 
     <Button
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="Confirm" />
+        android:text="@string/confirm" />
 
     <Button
         android:id="@+id/stop_service"
@@ -100,7 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Stop" />
+        android:text="@string/stop" />
 
     <ScrollView
         android:id="@+id/mode_tracking_note_view"
@@ -117,15 +117,16 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" 
+            android:layout_height="wrap_content" 
     		android:focusable="true"
     		android:focusableInTouchMode="true">
+
             <EditText
-            android:id="@+id/mode_tracking_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Note">
+                android:id="@+id/mode_tracking_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/note_hint" >
 
         	</EditText>
         </RelativeLayout>
