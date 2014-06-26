@@ -6,5 +6,5 @@
 	<string name="gps_service_started">GPS Service Started</string>
 	<string name="acc_service_started">ACC Service Started</string>
 	<string name="notification_title">Prepare your battery</string>
-	<string name="notification_message">Smartrac data collection</string>
+	<string name="notification_message">Smartrac Draining Battery</string>
 </resources>

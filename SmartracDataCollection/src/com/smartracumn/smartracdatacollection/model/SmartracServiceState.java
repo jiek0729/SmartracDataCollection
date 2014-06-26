@@ -9,6 +9,22 @@ public class SmartracServiceState {
 	private int accFileRate;
 	private String mode;
 
+	public int getGpsRate() {
+		return gpsRate;
+	}
+
+	public int getGpsFileRate() {
+		return gpsFileRate;
+	}
+
+	public int getAccRate() {
+		return accRate;
+	}
+
+	public int getAccFileRate() {
+		return accFileRate;
+	}
+
 	public SmartracServiceState(boolean gpsRunning, boolean accRunning) {
 		this.gpsRunning = gpsRunning;
 		this.accRunning = accRunning;

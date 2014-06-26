@@ -1,6 +1,7 @@
 package com.smartracumn.smartracdatacollection.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.smartracumn.smartracdatacollection.model.LocationWrapper;
 import com.smartracumn.smartracdatacollection.model.SmartracSensorData;
@@ -9,7 +10,42 @@ public class SmartracDataFormat {
 	private static final SimpleDateFormat MY_FORMAT = new SimpleDateFormat(
 			"yyyy/MM/dd, HH:mm:ss");
 
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
+			"yyyy-MM-dd");
+
 	private final String SPLITER = ", ";
+
+	private final String FILE_SPLITER = "&";
+
+	public static SimpleDateFormat getDateTimeFormat() {
+		return MY_FORMAT;
+	}
+
+	public static SimpleDateFormat getDateFormat() {
+		return DATE_FORMAT;
+	}
+
+	public String getModeHeader() {
+		return "Date, Time, Mode" + SPLITER + "Note";
+	}
+
+	public String getFileName(String imei, Date time, String fileName) {
+		return imei + FILE_SPLITER + DATE_FORMAT.format(time) + FILE_SPLITER
+				+ fileName;
+	}
+
+	public String formatModeAndNote(Date time, String mode, String note) {
+		StringBuilder data = new StringBuilder();
+		data.append(MY_FORMAT.format(time));
+		data.append(SPLITER);
+		data.append(mode);
+		if (note != null && !note.equals("")) {
+			data.append(SPLITER);
+			data.append(note);
+		}
+
+		return data.toString();
+	}
 
 	public String formatLocation(LocationWrapper loc) {
 		StringBuilder data = new StringBuilder();
@@ -28,7 +64,27 @@ public class SmartracDataFormat {
 		data.append(loc.getLocation().getAltitude());
 		data.append(SPLITER);
 		data.append(loc.getLocation().getBearing());
+
+		return data.toString();
+	}
+
+	public String getGpsHeader() {
+		StringBuilder data = new StringBuilder();
+		data.append("Date, Time");
 		data.append(SPLITER);
+		data.append("Latitude");
+		data.append(SPLITER);
+		data.append("Longitude");
+		data.append(SPLITER);
+		data.append("Speed");
+		data.append(SPLITER);
+		data.append("Provider");
+		data.append(SPLITER);
+		data.append("Accuracy");
+		data.append(SPLITER);
+		data.append("Altitude");
+		data.append(SPLITER);
+		data.append("Bearing");
 
 		return data.toString();
 	}
@@ -57,7 +113,27 @@ public class SmartracDataFormat {
 		return data.toString();
 	}
 
-	public static SimpleDateFormat getDateTimeFormat() {
-		return MY_FORMAT;
+	public String getAccHeader() {
+		StringBuilder data = new StringBuilder();
+
+		data.append("Date, Time");
+		data.append(SPLITER);
+		data.append("LinearX");
+		data.append(SPLITER);
+		data.append("LinearY");
+		data.append(SPLITER);
+		data.append("LinearZ");
+		data.append(SPLITER);
+		data.append("LinearMagnitude");
+		data.append(SPLITER);
+		data.append("TrueX");
+		data.append(SPLITER);
+		data.append("TrueY");
+		data.append(SPLITER);
+		data.append("TrueZ");
+		data.append(SPLITER);
+		data.append("TrueMagnitude");
+
+		return data.toString();
 	}
 }

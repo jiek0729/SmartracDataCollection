@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Notification;
@@ -23,6 +24,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.smartracumn.smartracdatacollection.R;
@@ -46,6 +48,17 @@ public class GpsService extends Service implements LocationListener {
 	private int gpsSamplingRate = 0;
 
 	private int gpsWriteFileRate = 0;
+
+	private String imei;
+
+	private String getImei() {
+		if (imei == null) {
+			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+			imei = telephonyManager.getDeviceId().toString();
+		}
+
+		return imei;
+	}
 
 	private List<LocationWrapper> cachedGpsLocations = new ArrayList<LocationWrapper>();
 
@@ -149,6 +162,9 @@ public class GpsService extends Service implements LocationListener {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroy()");
 		gpsUpdateHandler.removeCallbacks(gpsRecorderRunnable);
 		unregisterLocationListener();
+		if (gpsSamplingRate > 0) {
+			new WriteFileTask().execute(cachedGpsLocations);
+		}
 		super.onDestroy();
 	}
 
@@ -194,7 +210,11 @@ public class GpsService extends Service implements LocationListener {
 			}
 
 			if (myDir.exists()) {
-				return new File(myDir.getPath() + "/Gps.txt");
+				String fileName = myDir.getPath()
+						+ "/"
+						+ new SmartracDataFormat().getFileName(getImei(),
+								new Date(), "Gps.txt");
+				return new File(fileName);
 			}
 
 			return null;
@@ -203,14 +223,19 @@ public class GpsService extends Service implements LocationListener {
 		@Override
 		protected Void doInBackground(List<LocationWrapper>... params) {
 			// TODO Auto-generated method stub
-
-			if (getDirectory() != null) {
+			File file = getDirectory();
+			if (file != null) {
 				Log.i(TAG, getClass().getSimpleName() + "write to file: "
-						+ getDirectory().getPath());
+						+ file.getPath());
 				try {
+					boolean WriteHeader = !file.exists();
 					FileWriter fw = new FileWriter(getDirectory(), true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter pw = new PrintWriter(bw);
+					if (WriteHeader) {
+						pw.println(new SmartracDataFormat().getGpsHeader());
+					}
+
 					for (LocationWrapper location : params[0]) {
 						pw.println(new SmartracDataFormat()
 								.formatLocation(location));

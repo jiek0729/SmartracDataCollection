@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,7 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.smartracumn.smartracdatacollection.R;
 import com.smartracumn.smartracdatacollection.model.SmartracServiceState;
@@ -24,39 +22,9 @@ import com.smartracumn.smartracdatacollection.service.GpsService;
 public class MainActivity extends FragmentActivity {
 	private final String TAG = getClass().getName();
 
-	private ProgressBar progressBar;
-
 	private SmartracServiceState currentState;
 
-	private int gpsSamplingRate = 0;
-
-	private int gpsWriteFileRate = 0;
-
-	private int accSamplingRate = 0;
-
-	private int accWriteFileRate = 0;
-
-	private String mode = "Unknown";
-
 	private OnStateChangeListener stateChangeListener;
-
-	private Map<Integer, Integer> buttonValueMapping;
-
-	private void initializeButtonValueMapping() {
-		buttonValueMapping = new HashMap<Integer, Integer>();
-		buttonValueMapping.put(R.id.gps_no, 0);
-		buttonValueMapping.put(R.id.gps_1s, 1);
-		buttonValueMapping.put(R.id.gps_5s, 5);
-		buttonValueMapping.put(R.id.gps_file_1s, 1);
-		buttonValueMapping.put(R.id.gps_file_5s, 5);
-		buttonValueMapping.put(R.id.gps_file_30s, 30);
-		buttonValueMapping.put(R.id.acc_sampling_rate_no, 0);
-		buttonValueMapping.put(R.id.acc_sampling_rate_1s, 1);
-		buttonValueMapping.put(R.id.acc_sampling_rate_5s, 5);
-		buttonValueMapping.put(R.id.acc_filing_rate_1s, 1);
-		buttonValueMapping.put(R.id.acc_filing_rate_5s, 5);
-		buttonValueMapping.put(R.id.acc_filing_rate_30s, 30);
-	}
 
 	public interface OnStateChangeListener {
 		void onStateChanged(SmartracServiceState state);
@@ -83,26 +51,19 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	public void setRates(int gpsRateId, int gpsFileId, int accRateId,
-			int accFileId) {
-		gpsSamplingRate = buttonValueMapping.get(gpsRateId);
-
-		gpsWriteFileRate = buttonValueMapping.get(gpsFileId);
-
-		accSamplingRate = buttonValueMapping.get(accRateId);
-
-		accWriteFileRate = buttonValueMapping.get(accFileId);
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
+	public void setRates(int gpsRate, int gpsFileRate, int accRate,
+			int accFileRate) {
+		currentState.setGpsRate(gpsRate, gpsFileRate);
+		currentState.setAccRate(accRate, accFileRate);
 	}
 
 	public void startGpsService() {
-		if (gpsSamplingRate > 0 && gpsWriteFileRate > 0) {
+		if (currentState.getGpsRate() > 0) {
 			Intent service = new Intent(this, GpsService.class);
-			service.putExtra(GpsService.GPS_SAMPLING_RATE, gpsSamplingRate);
-			service.putExtra(GpsService.GPS_WRITE_FILE_RATE, gpsWriteFileRate);
+			service.putExtra(GpsService.GPS_SAMPLING_RATE,
+					currentState.getGpsRate());
+			service.putExtra(GpsService.GPS_WRITE_FILE_RATE,
+					currentState.getGpsFileRate());
 			this.startService(service);
 		}
 	}
@@ -112,10 +73,12 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void startAccService() {
-		if (accSamplingRate > 0 && accWriteFileRate > 0) {
+		if (currentState.getAccRate() > 0) {
 			Intent service = new Intent(this, AccService.class);
-			service.putExtra(AccService.ACC_SAMPLING_RATE, accSamplingRate);
-			service.putExtra(AccService.ACC_WRITE_FILE_RATE, accWriteFileRate);
+			service.putExtra(AccService.ACC_SAMPLING_RATE,
+					currentState.getAccRate());
+			service.putExtra(AccService.ACC_WRITE_FILE_RATE,
+					currentState.getAccFileRate());
 			this.startService(service);
 		}
 	}
@@ -129,24 +92,37 @@ public class MainActivity extends FragmentActivity {
 			startGpsService();
 			startAccService();
 			SmartracServiceState state = new SmartracServiceState(
-					gpsSamplingRate > 0, accSamplingRate > 0);
-			state.setGpsRate(gpsSamplingRate, gpsWriteFileRate);
-			state.setAccRate(accSamplingRate, accWriteFileRate);
-			state.setMode(mode);
+					currentState.getGpsRate() > 0,
+					currentState.getAccRate() > 0);
+			state.setGpsRate(currentState.getGpsRate(),
+					currentState.getGpsFileRate());
+			state.setAccRate(currentState.getAccRate(),
+					currentState.getAccFileRate());
+			state.setMode(currentState.getMode());
 			setCurrentState(state);
+			Toast.makeText(getApplicationContext(), "Service Started",
+					Toast.LENGTH_LONG);
 		}
 	}
 
 	public void stopServices() {
-		stopGpsService();
-		stopAccService();
+		if (currentState.hasServiceRunning()) {
+			stopGpsService();
+			stopAccService();
+
+			SmartracServiceState state = new SmartracServiceState(false, false);
+
+			setCurrentState(state);
+			gotoSamplingSetting();
+			Toast.makeText(getApplicationContext(), "Service Stopped",
+					Toast.LENGTH_LONG);
+		}
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, getClass().getSimpleName() + " onCreate()");
-		initializeButtonValueMapping();
 		setContentView(R.layout.main_activity);
 	}
 
@@ -246,9 +222,11 @@ public class MainActivity extends FragmentActivity {
 					PrintWriter modePw = new PrintWriter(new BufferedWriter(
 							new FileWriter(file + "/.mode")));
 
-					gpsPw.println(gpsSamplingRate + " " + gpsWriteFileRate);
-					accPw.println(accSamplingRate + " " + accWriteFileRate);
-					modePw.println(mode);
+					gpsPw.println(currentState.getGpsRate() + " "
+							+ currentState.getGpsFileRate());
+					accPw.println(currentState.getAccRate() + " "
+							+ currentState.getAccFileRate());
+					modePw.println(currentState.getMode());
 
 					gpsPw.close();
 					accPw.close();

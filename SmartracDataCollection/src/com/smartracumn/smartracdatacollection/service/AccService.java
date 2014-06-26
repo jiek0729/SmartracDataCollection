@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.smartracumn.smartracdatacollection.R;
@@ -44,6 +45,17 @@ public class AccService extends Service implements SensorEventListener {
 	private int accSamplingRate = 0;
 
 	private int accWriteFileRate = 0;
+
+	private String imei;
+
+	private String getImei() {
+		if (imei == null) {
+			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+			imei = telephonyManager.getDeviceId().toString();
+		}
+
+		return imei;
+	}
 
 	private List<SmartracSensorData> cachedSensorData = new ArrayList<SmartracSensorData>();
 
@@ -115,6 +127,9 @@ public class AccService extends Service implements SensorEventListener {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroy()");
 		accUpdateHandler.removeCallbacks(accRecorderRunnable);
 		unregisterSensorListener();
+		if (accSamplingRate > 0) {
+			new WriteFileTask().execute(cachedSensorData);
+		}
 		super.onDestroy();
 	}
 
@@ -264,7 +279,11 @@ public class AccService extends Service implements SensorEventListener {
 			}
 
 			if (myDir.exists()) {
-				return new File(myDir.getPath() + "/Acc.txt");
+				String fileName = myDir.getPath()
+						+ "/"
+						+ new SmartracDataFormat().getFileName(getImei(),
+								new Date(), "Acc.txt");
+				return new File(fileName);
 			}
 
 			return null;
@@ -273,18 +292,24 @@ public class AccService extends Service implements SensorEventListener {
 		@Override
 		protected Void doInBackground(List<SmartracSensorData>... params) {
 			// TODO Auto-generated method stub
-
-			if (getDirectory() != null) {
+			File file = getDirectory();
+			if (file != null) {
 				Log.i(TAG, getClass().getSimpleName() + "write to file: "
-						+ getDirectory().getPath());
+						+ file.getPath());
 				try {
-					FileWriter fw = new FileWriter(getDirectory(), true);
+					boolean writeHeader = !file.exists();
+					FileWriter fw = new FileWriter(file, true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter pw = new PrintWriter(bw);
+					if (writeHeader) {
+						pw.println(new SmartracDataFormat().getAccHeader());
+					}
+
 					for (SmartracSensorData sensorData : params[0]) {
 						pw.println(new SmartracDataFormat()
 								.formatSensorData(sensorData));
 					}
+
 					pw.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

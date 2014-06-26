@@ -1,26 +1,39 @@
 package com.smartracumn.smartracdatacollection.ui;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.smartracumn.smartracdatacollection.R;
 import com.smartracumn.smartracdatacollection.model.SmartracServiceState;
 import com.smartracumn.smartracdatacollection.ui.MainActivity.OnStateChangeListener;
+import com.smartracumn.smartracdatacollection.util.SmartracDataFormat;
 
 public class ModeTrackingFragment extends Fragment {
 	private final String TAG = getClass().getName();
@@ -33,7 +46,21 @@ public class ModeTrackingFragment extends Fragment {
 
 	private TextView serviceMonitor;
 
+	private EditText note;
+
 	private Map<Integer, String> modesMap;
+
+	private String imei;
+
+	private String getImei() {
+		if (imei == null) {
+			TelephonyManager telephonyManager = (TelephonyManager) getActivity()
+					.getSystemService(Context.TELEPHONY_SERVICE);
+			imei = telephonyManager.getDeviceId().toString();
+		}
+
+		return imei;
+	}
 
 	private OnStateChangeListener stateChangeListener = new OnStateChangeListener() {
 
@@ -94,6 +121,7 @@ public class ModeTrackingFragment extends Fragment {
 		modes = (RadioGroup) getView().findViewById(R.id.mode_tracking_modes);
 		serviceMonitor = (TextView) getView()
 				.findViewById(R.id.service_monitor);
+		note = (EditText) getView().findViewById(R.id.mode_tracking_note);
 
 		if (getActivity() != null) {
 			updateHeaderColor();
@@ -105,10 +133,6 @@ public class ModeTrackingFragment extends Fragment {
 			if (state.hasServiceRunning()) {
 				setCheckedMode(state);
 			}
-		}
-
-		if (getActivity() != null) {
-
 		}
 
 		update.setOnClickListener(new OnClickListener() {
@@ -128,8 +152,7 @@ public class ModeTrackingFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (getActivity() != null) {
-					((MainActivity) getActivity()).stopGpsService();
-					((MainActivity) getActivity()).stopAccService();
+					confirmStop();
 				}
 			}
 		});
@@ -165,6 +188,38 @@ public class ModeTrackingFragment extends Fragment {
 
 	}
 
+	private void confirmStop() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				getActivity());
+
+		// set title
+		alertDialogBuilder.setTitle("Confirm Mode");
+
+		// set dialog message
+		alertDialogBuilder
+				.setMessage("Are you sure you wanna stop sampling?")
+				.setCancelable(false)
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								// if this button is clicked, close
+								// current activity
+								((MainActivity) getActivity()).stopServices();
+							}
+						})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
+	}
+
 	private void confirmStart() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				getActivity());
@@ -175,16 +230,22 @@ public class ModeTrackingFragment extends Fragment {
 		// set dialog message
 		alertDialogBuilder
 				.setMessage(
-						"Are you sure you update mode and proceed to sampling?")
+						"Are you sure you wanna update mode and proceed to sampling?")
 				.setCancelable(false)
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								// if this button is clicked, close
 								// current activity
-								((MainActivity) getActivity()).setMode(modesMap
-										.get(modes.getCheckedRadioButtonId()));
+								((MainActivity) getActivity())
+										.getCurrentState()
+										.setMode(
+												modesMap.get(modes
+														.getCheckedRadioButtonId()));
 								((MainActivity) getActivity()).startServices();
+								new WriteFileTask()
+										.execute(((MainActivity) getActivity())
+												.getCurrentState());
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -238,5 +299,65 @@ public class ModeTrackingFragment extends Fragment {
 	public void onDestroyView() {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroyView()");
 		super.onDestroyView();
+	}
+
+	private class WriteFileTask extends
+			AsyncTask<SmartracServiceState, Void, Void> {
+
+		private File getDirectory() {
+			File myDir = new File(Environment.getExternalStorageDirectory()
+					.getPath() + "/SMDataCollection_data");
+			if (!myDir.exists()) {
+				myDir.mkdir();
+			}
+
+			if (myDir.exists()) {
+				String fileName = myDir.getPath()
+						+ "/"
+						+ new SmartracDataFormat().getFileName(getImei(),
+								new Date(), "Mode and Note.txt");
+				return new File(fileName);
+			}
+
+			return null;
+		}
+
+		@Override
+		protected Void doInBackground(SmartracServiceState... params) {
+			// TODO Auto-generated method stub
+			File file = getDirectory();
+			if (file != null) {
+				Log.i(TAG, getClass().getSimpleName() + "write to file: "
+						+ file.getPath());
+				try {
+					boolean writeHeader = !file.exists();
+					FileWriter fw = new FileWriter(file, true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					PrintWriter pw = new PrintWriter(bw);
+					if (writeHeader) {
+						pw.println(new SmartracDataFormat().getModeHeader());
+					}
+
+					pw.println(new SmartracDataFormat().formatModeAndNote(
+							new Date(), params[0].getMode(), note.getText()
+									.toString()));
+
+					pw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			note.setText("");
+
+			Toast.makeText(getActivity(), "Mode and Note Updated",
+					Toast.LENGTH_SHORT);
+		}
 	}
 }

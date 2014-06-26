@@ -48,12 +48,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
+        
+        <RadioButton
+            android:id="@+id/gps_file_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="No" />
 
         <RadioButton
             android:id="@+id/gps_file_1s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
             android:text="1" />
 
         <RadioButton
@@ -112,12 +118,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
+        
+        
+        <RadioButton
+            android:id="@+id/acc_filing_rate_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="No" />
 
         <RadioButton
             android:id="@+id/acc_filing_rate_1s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
             android:text="1" />
 
         <RadioButton

@@ -1,5 +1,8 @@
 package com.smartracumn.smartracdatacollection.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -25,6 +28,26 @@ public class SamplingRateSettingFragment extends Fragment {
 	private RadioGroup accSamplingGroup;
 	private RadioGroup accFileGroup;
 
+	private Map<Integer, Integer> ratesMapping;
+
+	private void initializeButtonValueMapping() {
+		ratesMapping = new HashMap<Integer, Integer>();
+		ratesMapping.put(R.id.gps_no, 0);
+		ratesMapping.put(R.id.gps_1s, 1);
+		ratesMapping.put(R.id.gps_5s, 5);
+		ratesMapping.put(R.id.gps_file_1s, 1);
+		ratesMapping.put(R.id.gps_file_5s, 5);
+		ratesMapping.put(R.id.gps_file_30s, 30);
+		ratesMapping.put(R.id.gps_file_no, 0);
+		ratesMapping.put(R.id.acc_sampling_rate_no, 0);
+		ratesMapping.put(R.id.acc_sampling_rate_1s, 1);
+		ratesMapping.put(R.id.acc_sampling_rate_5s, 5);
+		ratesMapping.put(R.id.acc_filing_rate_no, 0);
+		ratesMapping.put(R.id.acc_filing_rate_1s, 1);
+		ratesMapping.put(R.id.acc_filing_rate_5s, 5);
+		ratesMapping.put(R.id.acc_filing_rate_30s, 30);
+	}
+
 	@Override
 	public void onAttach(Activity activity) {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onAttach()");
@@ -42,6 +65,7 @@ public class SamplingRateSettingFragment extends Fragment {
 			Bundle savedInstanceState) {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onCreateView()");
 		super.onCreateView(inflater, container, savedInstanceState);
+		initializeButtonValueMapping();
 		return inflater.inflate(R.layout.sampling_rate_setting_layout,
 				container, false);
 	}
@@ -95,12 +119,14 @@ public class SamplingRateSettingFragment extends Fragment {
 								// if this button is clicked, close
 								// current activity
 								((MainActivity) getActivity()).setRates(
-										gpsSamplingGroup
-												.getCheckedRadioButtonId(),
-										gpsFileGroup.getCheckedRadioButtonId(),
-										accSamplingGroup
-												.getCheckedRadioButtonId(),
-										accFileGroup.getCheckedRadioButtonId());
+										ratesMapping.get(gpsSamplingGroup
+												.getCheckedRadioButtonId()),
+										ratesMapping.get(gpsFileGroup
+												.getCheckedRadioButtonId()),
+										ratesMapping.get(accSamplingGroup
+												.getCheckedRadioButtonId()),
+										ratesMapping.get(accFileGroup
+												.getCheckedRadioButtonId()));
 
 								((MainActivity) getActivity())
 										.gotoModeTracking();
