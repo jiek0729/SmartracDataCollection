@@ -139,7 +139,7 @@ public class AccService extends Service implements SensorEventListener {
 
 		if (intent != null) {
 			accSamplingRate = intent.getIntExtra(ACC_SAMPLING_RATE,
-					accSamplingRate) * 1000;
+					accSamplingRate);
 
 			accWriteFileRate = intent.getIntExtra(ACC_WRITE_FILE_RATE,
 					accWriteFileRate);

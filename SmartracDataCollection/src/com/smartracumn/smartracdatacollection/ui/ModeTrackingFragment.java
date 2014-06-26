@@ -357,7 +357,7 @@ public class ModeTrackingFragment extends Fragment {
 			note.setText("");
 
 			Toast.makeText(getActivity(), "Mode and Note Updated",
-					Toast.LENGTH_SHORT);
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 }

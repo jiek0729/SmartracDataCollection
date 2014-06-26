@@ -93,6 +93,12 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="No" />
+        
+        <RadioButton
+            android:id="@+id/acc_sampling_rate_5hz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5Hz" />
 
         <RadioButton
             android:id="@+id/acc_sampling_rate_1s"
