@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +27,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import com.smartracumn.smartracdatacollection.R;
 import com.smartracumn.smartracdatacollection.model.SmartracSensorData;
+import com.smartracumn.smartracdatacollection.ui.MainActivity;
 import com.smartracumn.smartracdatacollection.util.SmartracDataFormat;
 
 public class AccService extends Service implements SensorEventListener {
@@ -45,6 +49,12 @@ public class AccService extends Service implements SensorEventListener {
 
 	private SmartracSensorData currentSensorData;
 
+	private Sensor gravitySensor;
+
+	private Sensor magSensor;
+
+	private Sensor linearAccSensor;
+
 	Handler accUpdateHandler = new Handler();
 
 	Runnable accRecorderRunnable = new Runnable() {
@@ -58,7 +68,9 @@ public class AccService extends Service implements SensorEventListener {
 						List<SmartracSensorData> temp = new ArrayList<SmartracSensorData>(
 								cachedSensorData);
 						cachedSensorData.clear();
-						writeToFile(temp);
+						if (accWriteFileRate > 0) {
+							writeToFile(temp);
+						}
 					}
 				}
 
@@ -84,6 +96,18 @@ public class AccService extends Service implements SensorEventListener {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onCreate()");
 		super.onCreate();
 		registerSensorListener();
+
+		Notification notification = new Notification(
+				R.drawable.smartrac_data_collection_icon,
+				getText(R.string.acc_service_started),
+				System.currentTimeMillis());
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+		notification.setLatestEventInfo(this,
+				getText(R.string.notification_title),
+				getText(R.string.notification_message), pendingIntent);
+		startForeground(1234, notification);
 	}
 
 	@Override
@@ -100,7 +124,7 @@ public class AccService extends Service implements SensorEventListener {
 
 		if (intent != null) {
 			accSamplingRate = intent.getIntExtra(ACC_SAMPLING_RATE,
-					accSamplingRate);
+					accSamplingRate) * 1000;
 
 			accWriteFileRate = intent.getIntExtra(ACC_WRITE_FILE_RATE,
 					accWriteFileRate);
@@ -116,27 +140,31 @@ public class AccService extends Service implements SensorEventListener {
 			accUpdateHandler.postDelayed(accRecorderRunnable, accSamplingRate);
 		}
 
-		return Service.START_STICKY;
+		return Service.START_NOT_STICKY;
 	}
 
 	public boolean hasSensor() {
-		return getAccelorometer() != null;
+		return gravitySensor != null && magSensor != null
+				&& linearAccSensor != null;
 	}
 
-	private List<Sensor> getAccelorometer() {
+	private void getAccelorometer() {
 		SensorManager mngr = (SensorManager) this
 				.getSystemService(Context.SENSOR_SERVICE);
-		// List<Sensor> list = mngr.getSensorList(Sensor.TYPE_GRAVITY);
-		// list.addAll(mngr.getSensorList(Sensor.TYPE_MAGNETIC_FIELD));
-		// list.addAll(mngr.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION));
-		List<Sensor> list = mngr.getSensorList(Sensor.TYPE_ACCELEROMETER);
-		return list != null && !list.isEmpty() ? list : null;
+		gravitySensor = mngr.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		magSensor = mngr.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		linearAccSensor = mngr
+				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 	}
 
 	public void registerSensorListener() {
 		SensorManager mngr = (SensorManager) this
 				.getSystemService(Context.SENSOR_SERVICE);
-		List<Sensor> list = getAccelorometer();
+		getAccelorometer();
+		List<Sensor> list = new ArrayList<Sensor>();
+		list.add(gravitySensor);
+		list.add(magSensor);
+		list.add(linearAccSensor);
 		if (list != null) {
 			for (Sensor sensor : list) {
 				mngr.registerListener(this, sensor,

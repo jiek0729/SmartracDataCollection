@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +25,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import com.smartracumn.smartracdatacollection.R;
+import com.smartracumn.smartracdatacollection.model.LocationWrapper;
+import com.smartracumn.smartracdatacollection.ui.MainActivity;
 import com.smartracumn.smartracdatacollection.util.SmartracDataFormat;
 
 public class GpsService extends Service implements LocationListener {
@@ -32,13 +37,19 @@ public class GpsService extends Service implements LocationListener {
 
 	public static final String GPS_WRITE_FILE_RATE = "GPS write file rate";
 
+	private final String GPS_PROVIDER = "gps";
+
+	private final String NETWORK_PROVIDER = "network";
+
 	private MyBinder myBinder = new MyBinder();
 
 	private int gpsSamplingRate = 0;
 
 	private int gpsWriteFileRate = 0;
 
-	private List<Location> cachedLocations = new ArrayList<Location>();
+	private List<LocationWrapper> cachedGpsLocations = new ArrayList<LocationWrapper>();
+
+	private List<LocationWrapper> cachedNetworkLocations = new ArrayList<LocationWrapper>();
 
 	private Location currentLocation;
 
@@ -50,12 +61,32 @@ public class GpsService extends Service implements LocationListener {
 		public void run() {
 			if (gpsSamplingRate > 0) {
 				if (currentLocation != null) {
-					cachedLocations.add(currentLocation);
-					if (cachedLocations.size() == gpsWriteFileRate) {
-						List<Location> temp = new ArrayList<Location>(
-								cachedLocations);
-						cachedLocations.clear();
-						writeToFile(temp);
+					if (currentLocation.getProvider().equals(GPS_PROVIDER)) {
+						cachedGpsLocations.add(new LocationWrapper(
+								currentLocation));
+					} else {
+						cachedNetworkLocations.add(new LocationWrapper(
+								currentLocation));
+					}
+
+					if (cachedGpsLocations.size() == gpsWriteFileRate) {
+						List<LocationWrapper> temp = new ArrayList<LocationWrapper>(
+								cachedGpsLocations);
+						cachedGpsLocations.clear();
+						cachedNetworkLocations.clear();
+						if (gpsWriteFileRate > 0) {
+							writeToFile(temp);
+						}
+					}
+
+					if (cachedNetworkLocations.size() == gpsWriteFileRate) {
+						List<LocationWrapper> temp = new ArrayList<LocationWrapper>(
+								cachedNetworkLocations);
+						cachedGpsLocations.clear();
+						cachedNetworkLocations.clear();
+						if (gpsWriteFileRate > 0) {
+							writeToFile(temp);
+						}
 					}
 				}
 
@@ -63,7 +94,7 @@ public class GpsService extends Service implements LocationListener {
 			}
 		}
 
-		private void writeToFile(final List<Location> locations) {
+		private void writeToFile(final List<LocationWrapper> locations) {
 			// TODO Auto-generated method stub
 			Handler handler = new Handler(Looper.getMainLooper());
 			handler.post(new Runnable() {
@@ -99,6 +130,18 @@ public class GpsService extends Service implements LocationListener {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onCreate()");
 		super.onCreate();
 		registerLocationListener();
+
+		Notification notification = new Notification(
+				R.drawable.smartrac_data_collection_icon,
+				getText(R.string.gps_service_started),
+				System.currentTimeMillis());
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+		notification.setLatestEventInfo(this,
+				getText(R.string.notification_title),
+				getText(R.string.notification_message), pendingIntent);
+		startForeground(1234, notification);
 	}
 
 	@Override
@@ -115,7 +158,7 @@ public class GpsService extends Service implements LocationListener {
 
 		if (intent != null) {
 			gpsSamplingRate = intent.getIntExtra(GPS_SAMPLING_RATE,
-					gpsSamplingRate);
+					gpsSamplingRate) * 1000;
 
 			gpsWriteFileRate = intent.getIntExtra(GPS_WRITE_FILE_RATE,
 					gpsWriteFileRate);
@@ -131,7 +174,7 @@ public class GpsService extends Service implements LocationListener {
 			gpsUpdateHandler.postDelayed(gpsRecorderRunnable, gpsSamplingRate);
 		}
 
-		return Service.START_STICKY;
+		return Service.START_NOT_STICKY;
 	}
 
 	public class MyBinder extends Binder {
@@ -140,7 +183,8 @@ public class GpsService extends Service implements LocationListener {
 		}
 	}
 
-	private class WriteFileTask extends AsyncTask<List<Location>, Void, Void> {
+	private class WriteFileTask extends
+			AsyncTask<List<LocationWrapper>, Void, Void> {
 
 		private File getDirectory() {
 			File myDir = new File(Environment.getExternalStorageDirectory()
@@ -157,7 +201,7 @@ public class GpsService extends Service implements LocationListener {
 		}
 
 		@Override
-		protected Void doInBackground(List<Location>... params) {
+		protected Void doInBackground(List<LocationWrapper>... params) {
 			// TODO Auto-generated method stub
 
 			if (getDirectory() != null) {
@@ -167,10 +211,11 @@ public class GpsService extends Service implements LocationListener {
 					FileWriter fw = new FileWriter(getDirectory(), true);
 					BufferedWriter bw = new BufferedWriter(fw);
 					PrintWriter pw = new PrintWriter(bw);
-					for (Location location : params[0]) {
+					for (LocationWrapper location : params[0]) {
 						pw.println(new SmartracDataFormat()
 								.formatLocation(location));
 					}
+
 					pw.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

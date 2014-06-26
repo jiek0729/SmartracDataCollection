@@ -1,11 +1,17 @@
 package com.smartracumn.smartracdatacollection.ui;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.smartracumn.smartracdatacollection.R;
+import com.smartracumn.smartracdatacollection.model.SmartracServiceState;
+import com.smartracumn.smartracdatacollection.service.AccService;
 import com.smartracumn.smartracdatacollection.service.GpsService;
 
 public class PrepareFragment extends Fragment {
@@ -92,24 +100,75 @@ public class PrepareFragment extends Fragment {
 		super.onDestroyView();
 	}
 
-	private class PrepareTask extends AsyncTask<Void, Integer, Boolean> {
+	private class PrepareTask extends
+			AsyncTask<Void, Integer, SmartracServiceState> {
 		private boolean isMyServiceRunning(Class<?> serviceClass) {
-			ActivityManager manager = (ActivityManager) getActivity()
-					.getSystemService(Context.ACTIVITY_SERVICE);
-			for (RunningServiceInfo service : manager
-					.getRunningServices(Integer.MAX_VALUE)) {
-				if (serviceClass.getName().equals(
-						service.service.getClassName())) {
-					return true;
+			if (getActivity() != null) {
+				ActivityManager manager = (ActivityManager) getActivity()
+						.getSystemService(Context.ACTIVITY_SERVICE);
+				for (RunningServiceInfo service : manager
+						.getRunningServices(Integer.MAX_VALUE)) {
+					if (serviceClass.getName().equals(
+							service.service.getClassName())) {
+						return true;
+					}
 				}
 			}
 			return false;
 		}
 
+		private String readFile(File file) {
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				StringBuilder sb = new StringBuilder();
+				String line = br.readLine();
+
+				if (line != null) {
+					sb.append(line);
+				}
+
+				br.close();
+				return sb.toString();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
 		@Override
-		protected Boolean doInBackground(Void... arg0) {
+		protected SmartracServiceState doInBackground(Void... arg0) {
+			publishProgress(10);
+
+			SmartracServiceState state = new SmartracServiceState(
+					isMyServiceRunning(GpsService.class),
+					isMyServiceRunning(AccService.class));
+
+			int gpsRate = 0, gpsFileRate = 0, accRate = 0, accFileRate = 0;
+			String mode = "Unknown";
+
+			String dir = Environment.getExternalStorageDirectory().getPath()
+					+ "/SMDataCollection_data";
+
+			File gpsFile = new File(dir + "/.gps");
+			File accFile = new File(dir + "/.acc");
+			File modeFile = new File(dir + "/.mode");
+
+			publishProgress(30);
+
+			if (gpsFile.exists()) {
+				String[] ss = readFile(gpsFile).split(" ");
+				state.setGpsRate(Integer.valueOf(ss[0]), Integer.valueOf(ss[1]));
+			}
+			if (accFile.exists()) {
+				String[] ss = readFile(accFile).split(" ");
+				state.setAccRate(Integer.valueOf(ss[0]), Integer.valueOf(ss[1]));
+			}
+			if (modeFile.exists()) {
+				state.setMode(readFile(modeFile));
+			}
+
 			publishProgress(50);
-			return isMyServiceRunning(GpsService.class);
+
+			return state;
 		}
 
 		@Override
@@ -118,11 +177,11 @@ public class PrepareFragment extends Fragment {
 		}
 
 		@Override
-		protected void onPostExecute(Boolean isRunning) {
+		protected void onPostExecute(SmartracServiceState state) {
 			publishProgress(100);
 			if (getActivity() != null) {
-				((MainActivity) getActivity()).setIsRecording(isRunning);
-				if (isRunning) {
+				((MainActivity) getActivity()).setCurrentState(state);
+				if (state.hasServiceRunning()) {
 					((MainActivity) getActivity()).gotoModeTracking();
 				} else {
 					((MainActivity) getActivity()).gotoSamplingSetting();

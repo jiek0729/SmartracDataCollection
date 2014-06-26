@@ -117,7 +117,6 @@ public class SamplingRateSettingFragment extends Fragment {
 
 		// show it
 		alertDialog.show();
-
 	}
 
 	@Override

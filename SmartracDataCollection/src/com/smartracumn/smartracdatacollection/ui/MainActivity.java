@@ -1,15 +1,23 @@
 package com.smartracumn.smartracdatacollection.ui;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.smartracumn.smartracdatacollection.R;
+import com.smartracumn.smartracdatacollection.model.SmartracServiceState;
 import com.smartracumn.smartracdatacollection.service.AccService;
 import com.smartracumn.smartracdatacollection.service.GpsService;
 
@@ -18,6 +26,8 @@ public class MainActivity extends FragmentActivity {
 
 	private ProgressBar progressBar;
 
+	private SmartracServiceState currentState;
+
 	private int gpsSamplingRate = 0;
 
 	private int gpsWriteFileRate = 0;
@@ -25,6 +35,10 @@ public class MainActivity extends FragmentActivity {
 	private int accSamplingRate = 0;
 
 	private int accWriteFileRate = 0;
+
+	private String mode = "Unknown";
+
+	private OnStateChangeListener stateChangeListener;
 
 	private Map<Integer, Integer> buttonValueMapping;
 
@@ -44,25 +58,44 @@ public class MainActivity extends FragmentActivity {
 		buttonValueMapping.put(R.id.acc_filing_rate_30s, 30);
 	}
 
-	private boolean isRecording;
-
-	public void setIsRecording(boolean isRecording) {
-		this.isRecording = isRecording;
+	public interface OnStateChangeListener {
+		void onStateChanged(SmartracServiceState state);
 	}
 
-	public boolean getIsRecording() {
-		return isRecording;
+	public void setCurrentState(SmartracServiceState state) {
+		currentState = state;
+		if (stateChangeListener != null) {
+			stateChangeListener.onStateChanged(currentState);
+		}
+	}
+
+	public SmartracServiceState getCurrentState() {
+		return currentState;
+	}
+
+	public void registerStateChangeListener(OnStateChangeListener listener) {
+		this.stateChangeListener = listener;
+	}
+
+	public void unregisterStateChangeListener(OnStateChangeListener listener) {
+		if (this.stateChangeListener.equals(listener)) {
+			this.stateChangeListener = null;
+		}
 	}
 
 	public void setRates(int gpsRateId, int gpsFileId, int accRateId,
 			int accFileId) {
-		gpsSamplingRate = buttonValueMapping.get(gpsRateId) * 1000;
+		gpsSamplingRate = buttonValueMapping.get(gpsRateId);
 
 		gpsWriteFileRate = buttonValueMapping.get(gpsFileId);
 
-		accSamplingRate = buttonValueMapping.get(accRateId) * 1000;
+		accSamplingRate = buttonValueMapping.get(accRateId);
 
 		accWriteFileRate = buttonValueMapping.get(accFileId);
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 	public void startGpsService() {
@@ -89,6 +122,24 @@ public class MainActivity extends FragmentActivity {
 
 	public void stopAccService() {
 		this.stopService(new Intent(this, AccService.class));
+	}
+
+	public void startServices() {
+		if (!currentState.hasServiceRunning()) {
+			startGpsService();
+			startAccService();
+			SmartracServiceState state = new SmartracServiceState(
+					gpsSamplingRate > 0, accSamplingRate > 0);
+			state.setGpsRate(gpsSamplingRate, gpsWriteFileRate);
+			state.setAccRate(accSamplingRate, accWriteFileRate);
+			state.setMode(mode);
+			setCurrentState(state);
+		}
+	}
+
+	public void stopServices() {
+		stopGpsService();
+		stopAccService();
 	}
 
 	@Override
@@ -150,11 +201,65 @@ public class MainActivity extends FragmentActivity {
 	protected void onStop() {
 		super.onStop();
 		Log.i(TAG, getClass().getSimpleName() + " onStop()");
+		saveServiceState();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		Log.i(TAG, getClass().getSimpleName() + " onDestroy()");
+	}
+
+	private void saveServiceState() {
+		new WriteFileTask().execute();
+	}
+
+	private class WriteFileTask extends AsyncTask<Void, Void, Void> {
+
+		private String getDirectory() {
+			File myDir = new File(Environment.getExternalStorageDirectory()
+					.getPath() + "/SMDataCollection_data");
+			if (!myDir.exists()) {
+				myDir.mkdir();
+			}
+
+			if (myDir.exists()) {
+				return myDir.getPath();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			String file = getDirectory();
+
+			if (getDirectory() != null) {
+				Log.i(TAG, getClass().getSimpleName() + "write to file: "
+						+ file);
+				try {
+					PrintWriter gpsPw = new PrintWriter(new BufferedWriter(
+							new FileWriter(file + "/.gps")));
+					PrintWriter accPw = new PrintWriter(new BufferedWriter(
+							new FileWriter(file + "/.acc")));
+					PrintWriter modePw = new PrintWriter(new BufferedWriter(
+							new FileWriter(file + "/.mode")));
+
+					gpsPw.println(gpsSamplingRate + " " + gpsWriteFileRate);
+					accPw.println(accSamplingRate + " " + accWriteFileRate);
+					modePw.println(mode);
+
+					gpsPw.close();
+					accPw.close();
+					modePw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			return null;
+		}
 	}
 }

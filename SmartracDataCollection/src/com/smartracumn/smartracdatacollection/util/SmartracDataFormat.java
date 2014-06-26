@@ -1,35 +1,33 @@
 package com.smartracumn.smartracdatacollection.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import android.location.Location;
-
+import com.smartracumn.smartracdatacollection.model.LocationWrapper;
 import com.smartracumn.smartracdatacollection.model.SmartracSensorData;
 
 public class SmartracDataFormat {
-	private final SimpleDateFormat MY_FORMAT = new SimpleDateFormat(
+	private static final SimpleDateFormat MY_FORMAT = new SimpleDateFormat(
 			"yyyy/MM/dd, HH:mm:ss");
 
 	private final String SPLITER = ", ";
 
-	public String formatLocation(Location loc) {
+	public String formatLocation(LocationWrapper loc) {
 		StringBuilder data = new StringBuilder();
-		data.append(formatDateTime(new Date(loc.getTime())));
+		data.append(MY_FORMAT.format(loc.getTime()));
 		data.append(SPLITER);
-		data.append(loc.getLatitude());
+		data.append(loc.getLocation().getLatitude());
 		data.append(SPLITER);
-		data.append(loc.getLongitude());
+		data.append(loc.getLocation().getLongitude());
 		data.append(SPLITER);
-		data.append(loc.getSpeed());
+		data.append(loc.getLocation().getSpeed());
 		data.append(SPLITER);
-		data.append(loc.getProvider());
+		data.append(loc.getLocation().getProvider());
 		data.append(SPLITER);
-		data.append(loc.getAccuracy());
+		data.append(loc.getLocation().getAccuracy());
 		data.append(SPLITER);
-		data.append(loc.getAltitude());
+		data.append(loc.getLocation().getAltitude());
 		data.append(SPLITER);
-		data.append(loc.getBearing());
+		data.append(loc.getLocation().getBearing());
 		data.append(SPLITER);
 
 		return data.toString();
@@ -38,7 +36,7 @@ public class SmartracDataFormat {
 	public String formatSensorData(SmartracSensorData sensor) {
 		StringBuilder data = new StringBuilder();
 
-		data.append(formatDateTime(sensor.getTime()));
+		data.append(MY_FORMAT.format(sensor.getTime()));
 		data.append(SPLITER);
 		data.append(sensor.getLinearX());
 		data.append(SPLITER);
@@ -59,7 +57,7 @@ public class SmartracDataFormat {
 		return data.toString();
 	}
 
-	public String formatDateTime(Date date) {
-		return MY_FORMAT.format(date);
+	public static SimpleDateFormat getDateTimeFormat() {
+		return MY_FORMAT;
 	}
 }

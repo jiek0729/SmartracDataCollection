@@ -3,27 +3,38 @@
     android:id="@+id/mode_tracking_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp" >
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/mode_tracking_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="Tracking Note"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+    <RelativeLayout
+    android:id="@+id/mode_tracking_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+	    <TextView
+	        android:id="@+id/mode_tracking_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerHorizontal="true"
+	        android:text="Tracking Note"
+	        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	    <TextView
+	        android:id="@+id/service_monitor"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@+id/mode_tracking_title"/>
+
+	</RelativeLayout>
 
     <RadioGroup
         android:id="@+id/mode_tracking_modes"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/mode_tracking_title"
-        android:layout_marginTop="16dp" >
+        android:layout_below="@+id/mode_tracking_header">
 
         <RadioButton
             android:id="@+id/unknown"
