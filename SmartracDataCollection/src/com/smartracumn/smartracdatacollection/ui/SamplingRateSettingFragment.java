@@ -40,7 +40,7 @@ public class SamplingRateSettingFragment extends Fragment {
 		ratesMapping.put(R.id.gps_file_30s, 30);
 		ratesMapping.put(R.id.gps_file_no, 0);
 		ratesMapping.put(R.id.acc_sampling_rate_no, 0);
-		ratesMapping.put(R.id.acc_sampling_rate_5hz, 500);
+		ratesMapping.put(R.id.acc_sampling_rate_5hz, 200);
 		ratesMapping.put(R.id.acc_sampling_rate_1s, 1000);
 		ratesMapping.put(R.id.acc_sampling_rate_5s, 5000);
 		ratesMapping.put(R.id.acc_filing_rate_no, 0);

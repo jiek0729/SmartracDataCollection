@@ -142,8 +142,7 @@ public class MainActivity extends FragmentActivity {
 				.setCustomAnimations(R.anim.enter, R.anim.exit)
 				.replace(R.id.main_container,
 						new SamplingRateSettingFragment(),
-						"sampling rate setting fragment").addToBackStack(null)
-				.commit();
+						"sampling rate setting fragment").commit();
 	}
 
 	public void gotoModeTracking() {
@@ -151,7 +150,7 @@ public class MainActivity extends FragmentActivity {
 				.beginTransaction()
 				.setCustomAnimations(R.anim.enter, R.anim.exit)
 				.replace(R.id.main_container, new ModeTrackingFragment(),
-						"mode tracking fragment").addToBackStack(null).commit();
+						"mode tracking fragment").commit();
 	}
 
 	@Override
