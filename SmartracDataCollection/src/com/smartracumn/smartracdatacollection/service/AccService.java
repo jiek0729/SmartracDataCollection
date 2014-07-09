@@ -125,11 +125,14 @@ public class AccService extends Service implements SensorEventListener {
 	@Override
 	public void onDestroy() {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroy()");
-		accUpdateHandler.removeCallbacks(accRecorderRunnable);
-		unregisterSensorListener();
 		if (accSamplingRate > 0) {
 			new WriteFileTask().execute(cachedSensorData);
+			accSamplingRate = 0;
 		}
+
+		accUpdateHandler.removeCallbacks(accRecorderRunnable);
+		unregisterSensorListener();
+
 		super.onDestroy();
 	}
 

@@ -160,11 +160,12 @@ public class GpsService extends Service implements LocationListener {
 	@Override
 	public void onDestroy() {
 		Log.i(TAG, getClass().getSimpleName() + ":entered onDestroy()");
-		gpsUpdateHandler.removeCallbacks(gpsRecorderRunnable);
-		unregisterLocationListener();
 		if (gpsSamplingRate > 0) {
 			new WriteFileTask().execute(cachedGpsLocations);
+			gpsSamplingRate = 0;
 		}
+		gpsUpdateHandler.removeCallbacks(gpsRecorderRunnable);
+		unregisterLocationListener();
 		super.onDestroy();
 	}
 
